@@ -1,9 +1,16 @@
+# Script Name : omekaSGetFromAPI
+# Description : This script produces a CSV file and pulls live from Omeka S API
+# Authors     : Michelle Byrnes
+# Version     : 1.0
+
+### Libraries ###
 require 'uri'
 require 'yajl/http_stream'
 require 'csv'
 
+### Main ###
 def omekaSGet
-  ### Variable Helpers ###
+  ### Variable Helper Funcs ###
   def buildPath(name, index, grabber)
     {"metaname" => name, "index" => index, "grabber" => grabber}
   end
@@ -14,19 +21,19 @@ def omekaSGet
 
   ### Variables ###
   # url building vars
-  domain           = "http://beta.coda.coloredconventions.org/api/items"
+  domain           = "domain/api/items"
   key_identity     = OMEKA_S_API_KEY_IDENTITY
   key_credential   = OMEKA_S_API_KEY_CREDENTIAL
   api_vals         = [key_identity, key_credential]
-  # item type vars
+  # item type ids
   documents = 2
   events = 604
   names = 1470
-
-  totalNames = 44 # Can only grab 100 per page, 44 pages total.
+  # total pages, 100 item per page
+  totalNames = 44
   totalDocs = 2
-  # Item term vars
-  docterms  = [{"ID"          => "o:id"},
+  # Item term path vars
+  termsDocs  = [{"ID"          => "o:id"},
                {"Title"       => "o:title"},
                {"Item Type"   => metaPath("dcterms:type")},
                {"Creator"     => metaPath("dcterms:creator")},
@@ -39,7 +46,7 @@ def omekaSGet
                {"Has Version" => metaPath("dcterms:hasVersion")},
                {"Identifier"  => metaPath("dcterms:identifier")}]
 
-  nameterms = [{"ID"                    => "o:id"},
+  termsNames = [{"ID"                    => "o:id"},
                {"Full Name"             => "o:title"},
                {"First and Middle Name" => metaPath("foaf:firstName")},
                {"Last Name and Suffix"  => metaPath("foaf:lastName")},
@@ -93,15 +100,18 @@ def omekaSGet
     rawItems.map {|rawItem| buildItem(rawItem, terms)}
   end
 
+  ### Build Variables ###
+  # Depending on desired output, change totalNames to totalDesiredItemType, and change names to DesiredItemType.
   urls = buildURLs(totalNames, domain, api_vals, names)
   rawItems = writeHashes(urls)
-  items = buildItems(rawItems, nameterms)
+  # Also change termsNames to match termsDesiredItemType
+  items = buildItems(rawItems, termsNames)
   values = items.map {|item| item.values}
   col_headers = items[0].keys
   output = values.unshift(col_headers)
 
-  CSV.open("omekaSNames.csv", "w") do |csv|
+  # Write to the CSV file given above output
+  CSV.open(writePath, "w") do |csv|
     output.each {|item| csv << item }
   end
-
 end

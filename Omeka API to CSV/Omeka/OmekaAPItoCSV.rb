@@ -1,10 +1,10 @@
 # Script Name : omekaApitoCsv
-# Description : This script produces a CSV file of Omeka Items from a JSON file.
+# Description : This script produces a CSV file of Omeka Items given a JSON file.
 # Authors     : Michelle Byrnes
 # Version     : 1.0
 # Notes       : Requires the Yajl library.
 
-##### Data Definitions #####
+#### Data Definitions ####
 # An apiItem is a hash with the following keys
 # -- id                 : Number that is the Omeka assigned ID
 # -- url                : String that is the address of the Item
@@ -103,13 +103,12 @@
 # -- Text                       : String
 # -- Tags                       : Array
 
-##### Libraries #####
+#### Libraries ####
 require 'yajl'
 require 'csv'
 
-##### Functions #####
-# omekaApiToCsv: file[JSON] -> file[CSV]
-def omekaApiToCsv(file, type, filename)
+#### METHODS ####
+def omekaApiToCsv
 
   file = "/path/to/JSON"
   writePath = "/path/to/CSV"
