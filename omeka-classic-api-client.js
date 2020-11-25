@@ -1,6 +1,13 @@
+// Script Name: omeka-classic-api-client
+// Authors: Michelle Byrnes
+// Description: Fetches data from Omeka, parses, and then sorts it given a 
+// query and a sort parameter. 
+// Version: 1.0
+
 function omekaApiClient() {
   // CONTENTS //////////////////////////////////////////////////////////////////
 
+  // Version History                  [ VERSIONS ]
   // Data and Closure Definitions     [ DEFINITIONS ]
   // Explanation of Function Process  [ STEPS ]
   // Global Declarations              [ GLOBALS ]
@@ -9,6 +16,16 @@ function omekaApiClient() {
 
   //////////////////////////////////////////////////////////////////////////////
 
+  // VERSIONS //////////////////////////////////////////////////////////////////
+  
+  // v1.0 : This version fetches, parses, and sorts data from Omeka Classic.
+  //        It relies on hard coded variables set in GLOBALS. Moreover, the
+  //        query and sort parameter are set in their respective functions,
+  //        parseData and sortItems. 
+  // v2.0 : TODO abstract variables, query, and sort parameter.
+  
+  //////////////////////////////////////////////////////////////////////////////
+  
   // DEFINTIONS ////////////////////////////////////////////////////////////////
 
   // A RESPONSE is a raw FetchResponseObject of the Fetch API.
