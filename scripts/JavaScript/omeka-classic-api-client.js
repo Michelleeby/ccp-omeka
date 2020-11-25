@@ -341,4 +341,4 @@ function omekaClassicApiClient() {
 
 // Run the function.
 
-omekaClassicApiClient();
+//omekaClassicApiClient();
