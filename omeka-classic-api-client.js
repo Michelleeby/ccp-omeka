@@ -4,7 +4,7 @@
 // to a query and a sort parameter. 
 // Version: 1.0
 
-function omekaApiClient() {
+function omekaClassicApiClient() {
   // CONTENTS //////////////////////////////////////////////////////////////////
 
   // Version History                  [ VERSIONS ]
@@ -341,4 +341,4 @@ function omekaApiClient() {
 
 // Run the function.
 
-//omekaApiClient();
+//omekaClassicApiClient();
