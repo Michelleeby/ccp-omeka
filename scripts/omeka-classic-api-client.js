@@ -24,8 +24,8 @@ function omekaClassicApiClient() {
   //        variables set in GLOBALS. Moreover, the query and sort parameter 
   //        are set in their respective functions, parseData and sortItems. 
   // v2.0 : TODO abstract variables, query, and sort parameter. Consider 
-  //        removing HTML component from omekaApiClient() and have the function
-  //        instead return the sorted array of queried items. 
+  //        removing HTML component from omekaClassicApiClient() and instead 
+  //        have the function return the sorted array of queried items.
   
   //////////////////////////////////////////////////////////////////////////////
   
