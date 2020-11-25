@@ -303,7 +303,7 @@ function omekaClassicApiClient() {
     for (const item of items) {
       let innerHtml = `<p><a href="${item.url}">${item.title}</a></p>`;
       let html = `<li class="item-display">${innerHtml}</li>`;
-      $('#items-container').append(html);
+      document.getElementById('#items-container').append(html);
     }
 
     // Log the number of items returned.
