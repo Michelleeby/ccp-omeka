@@ -1,23 +1,62 @@
 // Script Name: omeka-classic-api-client
+// Input: Takes an object, query, and a string, sort. 
 // Authors: Michelle Byrnes
 // Description: Fetches data from Omeka, parses it, and then sorts it according
 // to a query and a sort parameter. 
-// Version: 1.0
+// Version: 2.0
 
-function omekaClassicApiClient() {
-  // CONTENTS //////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-  // Version History                  [ VERSIONS ]
-  // Data and Closure Definitions     [ DEFINITIONS ]
-  // Explanation of Function Process  [ STEPS ]
-  // Global Declarations              [ GLOBALS ]
-  // Closures                         [ CLOSURES ]
-  // Function Body                    [ BODY ]
+// CONTENTS ////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////
+// Sample Searches                  [ SAMPLES ]
+// Version History                  [ VERSIONS ]
+// Data and Closure Definitions     [ DEFINITIONS ]
+// Explanation of Function Process  [ STEPS ]
+// Global Declarations              [ GLOBALS ]
+// Closures                         [ CLOSURES ]
+// Function Body                    [ BODY ]
 
+////////////////////////////////////////////////////////////////////////////////
+
+// SAMPLES /////////////////////////////////////////////////////////////////////
+
+// query is an object where each key/value pair represents a search field to  
+// search in and the value to search for respectively. Each different field is 
+// searched together using an AND statement if more than one field is provided. 
+// See the possible query fields and sample searches below.
+
+// Possible Query Fields:
+
+// var query = {
+//  range: 'YYYY-YYYY', 
+//  state: 'SA' (State Abbreviation),
+//		-> state also takes a list of state abbreviations like ['PA', 'TX']
+//  city: 'City Name',
+//  year: 'YYYY',
+// }
+
+// Sample Search: 
+
+// Get all items between '1840-1860' AND with a state field equal to 'PA'
+// var query = {
+//  range: '1840-1860',
+//  state: 'PA',
+// }
+
+// Get all items from Texas or Georgia
+// var query = {
+// state: ['TX', 'GA']
+// }
+
+// sort can be 'date', 'title', 'city', or 'state', it determines the order the 
+// items will be sorted and displayed.
+
+////////////////////////////////////////////////////////////////////////////////
+
+function omekaClassicApiClient(query, sort) {
   // VERSIONS //////////////////////////////////////////////////////////////////
-  
+
   // v1.0 : This version fetches, parses, and sorts data from Omeka Classic. It
   //        then injects each sorted item into a provided HTML element. (Using 
   //        the TITLE and URL properties of the item). It relies on hard coded 
@@ -26,9 +65,9 @@ function omekaClassicApiClient() {
   // v2.0 : TODO abstract variables, query, and sort parameter. Consider 
   //        removing HTML component from omekaClassicApiClient() and instead 
   //        have the function return the sorted array of queried items.
-  
+
   //////////////////////////////////////////////////////////////////////////////
-  
+
   // DEFINTIONS ////////////////////////////////////////////////////////////////
 
   // A RESPONSE is a raw FetchResponseObject of the Fetch API.
@@ -187,8 +226,6 @@ function omekaClassicApiClient() {
   function parseData(data) {
     // Since each page is its own array of object, flatten the data.
     let blob = data.flat();
-    // Create the items array.
-    let items = [];
 
     // Set tester funcs to check metadata fields. (Metadata elements don't
     // always have the same index from item to item, so these tester funcs will
@@ -200,7 +237,7 @@ function omekaClassicApiClient() {
     let isCountry = (el) => el.element.id == metadata.country;
 
     // Iterate over each chunk of the data blob
-    for (const chunk of blob) {
+    const items = blob.reduce((acc, chunk) => {
       // Build metadata index
       let titleIndex = chunk.element_texts.findIndex(isTitle);
       let dateIndex = chunk.element_texts.findIndex(isDate);
@@ -234,37 +271,82 @@ function omekaClassicApiClient() {
         item.country = chunk.element_texts[countryIndex].text;
       }
 
-      // If the item meets this condition push into the items array. See sample 
-      // searches below.     
-      if (item.year.indexOf('185') != -1 || item.year.indexOf('186') != -1) {
-        items.push(item);
+      if (parseQuery(query, item)) {
+        acc.push(item);
       }
-      // Sample Searches /////////////////////////////////////////////////////
 
-      // if ( PASTE SAMPLE SEARCH HERE ) {...}
-      //    -> Copy the top line of the sample search into the if statement.
-
-      // item.year == '1865' && item.type == type.minutes
-      //    -> Returns items with year 1865 AND type minutes.
-
-      // item.city != 'Philadelphia'
-      //    -> Returns items where the city is NOT equal to Philadelphia.     
-
-      // item.year.indexOf('184') != -1 || item.year.indexOf('185') != -1
-      //    -> Returns items that either have 184 OR 185 in the year. 
-      //    -> In other words, it returns items spanning from 1840 to 1859. 
-      //    -> indexOf() looks for the given string, and returns -1 only when
-      //       it doesn't exist.
-
-      /////////////////////////////////////////////////////////////////////////
-    }
+      return acc
+    }, []);
 
     return items
+
+    function parseQuery(query, item) {
+      let keys = Object.keys(query);
+      let condition;
+
+      let bool = keys.reduce((acc, key) => {
+        if (key == 'range') {
+          const year1 = query.range.split('-')[0];
+          const year2 = query.range.split('-')[1];
+          const range = parseDecade(year1, year2);
+
+          condition = range.reduce((acc, year) => {
+            if (item.year.indexOf(year) != -1) {
+              acc = acc || true;
+            }
+            return acc;
+          }, false);
+
+          return condition
+        } else if (key == 'state') {
+          if (Array.isArray(query.state)) {
+            condition = query.state.reduce((acc, state) => {
+              if (item.state == state) {
+                acc = acc || true;
+              }
+              return acc;
+            }, false);
+
+            return condition
+          } else {
+            condition = (item.state == query.state);
+            return condition
+          }
+
+        } else if (key == 'city') {
+          condition = (item.city == query.city);
+          return condition
+        } else if (key == 'year') {
+          condition = (item.year == query.year);
+          return condition
+        }
+        return acc && condition
+
+      }, true);
+
+      return bool
+    }
+
+    function parseDecade(year1, year2) {
+      let diff = (year2 - year1) / 10;
+      let range = [year2.slice(0, 3)];
+
+      for (let i = 1; i <= diff; i++) {
+        let inc = i * 10;
+
+        range.unshift((year2 - inc).toString().slice(0, 3));
+
+      }
+      return range
+    }
+
   }
 
   // sortItems: items[ArrayOfItem] -> items[ArrayOfItem]
   // NOTE: sortBy can be set to 'title' 'state' 'city' or 'date'
-  function sortItems(items, sortBy = 'date') {
+  function sortItems(items) {
+    let sortBy = sort;
+
     let sorted = items.sort(function(a, b) {
       // Create fieldA and fieldB and set to blank string.
       let fieldA, fieldB = '';
@@ -299,7 +381,8 @@ function omekaClassicApiClient() {
   // buildHtml: items[ArrayOfItem] -> undefined
   function buildHtml(items) {
     // For each item in the sorted list, build HTML using url and title, append
-    // this HTML to the items-container. 
+    // this HTML to the items-container.
+
     for (const item of items) {
       let innerHtml = `<p><a href="${item.url}">${item.title}</a></p>`;
       let html = `<li class="item-display">${innerHtml}</li>`;
@@ -307,7 +390,7 @@ function omekaClassicApiClient() {
     }
 
     // Log the number of items returned.
-    console.log(`Returned ${items.length} items.`);
+    console.log(`Returned ${items.length} items.`)
   }
 
   // fetchItems: pages[ArrayOfNumber] -> Undefined
@@ -339,6 +422,4 @@ function omekaClassicApiClient() {
   // END ///////////////////////////////////////////////////////////////////////
 }
 
-// Run the function.
-
-//omekaClassicApiClient();
+//omekaClassicApiClient(query, sort);
