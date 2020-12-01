@@ -59,8 +59,7 @@
 // Get all items between '1830-1860' AND with a city field equal to 
 // 'Philadelphia' OR 'Pittsburgh'
 //var query = {
-//  range: '1830-1860',
-//  city: ['Philadelphia', 'Pittsburgh'],
+//  range: {start: 'YYYY', end: 'YYYY'},
 //};
 
 // sort can be 'date', 'title', 'city', or 'state', it determines the order
@@ -321,11 +320,11 @@ function omekaClassicApiClient(query, sort) {
 
     return items
   }
-	// addImgsToItems: 
+  // addImgsToItems: 
   // data[ArrayOfFile], imgItems[ArrayOfItem], noImgItems[ArrayOfItem] -> 
   // items[ArrayOfItems]
   function addImgsToItems(data, imgItems, noImgItems) {
-  	// Capture img file URLs into an array.
+    // Capture img file URLs into an array.
     let files = data.map(chunk => {
       let file = chunk[0].file_urls.fullsize;
       return file
@@ -334,14 +333,14 @@ function omekaClassicApiClient(query, sort) {
     let index = 0;
     // For each item in the imgItems array
     for (const item of imgItems) {
-    	// Update the thumnail with the appropriate img file URL
-    	item.thumbnail = files[index];
+      // Update the thumnail with the appropriate img file URL
+      item.thumbnail = files[index];
       // Increment index by 1
       index++;
     }
     // Combine updated imgItems with noImgItems array.
     let items = imgItems.concat(noImgItems);
-		
+
     // Return all the items.
     return items
   }
@@ -392,7 +391,7 @@ function omekaClassicApiClient(query, sort) {
       let html = `<li class="item-display">${innerHtml}</li>`;
       //let html = `<li class ="item-display"><img src="{item.thumbnail}"></li>`;
       document.getElementById('items-container')
-      .insertAdjacentHTML('beforeend', html);
+        .insertAdjacentHTML('beforeend', html);
     }
 
     // Log the number of items returned.
@@ -471,4 +470,13 @@ function omekaClassicApiClient(query, sort) {
   // END ///////////////////////////////////////////////////////////////////////
 }
 
-//omekaClassicApiClient(query, sort);
+var form = document.querySelector("form.items-search");
+form.addEventListener("submit", function(event) {
+  let query = {
+    range: `${form['start-year'].value}-${form['end-year'].value}`,
+  };
+  let sort = form['sort-value-select'].value;
+
+  event.preventDefault();
+  omekaClassicApiClient(query, sort);
+});
