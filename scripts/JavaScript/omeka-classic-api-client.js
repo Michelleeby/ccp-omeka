@@ -382,6 +382,7 @@ function omekaClassicApiClient(query, sort) {
 
   // buildHtml: items[ArrayOfItem] -> undefined
   function buildHtml(items) {
+
     // For each item in the sorted list, build HTML using url and title, append
     // this HTML to the items-container.
 
@@ -472,6 +473,12 @@ function omekaClassicApiClient(query, sort) {
 
 var form = document.querySelector("form.items-search");
 form.addEventListener("submit", function(event) {
+  // Flush the ul element  
+  let elements = document.querySelectorAll('li.item-display');
+  for (const element of elements) {
+    element.remove();
+  }
+
   let query = {
     range: `${form['start-year'].value}-${form['end-year'].value}`,
   };
