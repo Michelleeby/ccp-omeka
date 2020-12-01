@@ -404,7 +404,7 @@ function omekaClassicApiClient(query, sort) {
         .insertAdjacentHTML('beforeend', html);
     }
 		// Build stable link to the records found.
-    let resultsQueryUrl = buildSearchUrl(items);
+    let resultsQueryUrl = buildSearchUrl(items, sort);
     let html = `<p>Found ${items.length} records. <a href="${resultsQueryUrl}">Stable link to records.</a></p>`
     // Inject link and total results into the results query wrapper element.
     document.getElementById('results-query-wrapper')
@@ -413,11 +413,20 @@ function omekaClassicApiClient(query, sort) {
     console.log(`Returned ${items.length} items.`)
   }
 
-  function buildSearchUrl(items) {
-    let baseUrl = `${domain}/find?range=`
+  function buildSearchUrl(items, sort) {
+  	let sorter = 40; // set date as default sort value
+    if (sort == 'state') {
+    	sorter = metadata.state;
+    }
+    if (sort == 'city') {
+    	sorter = metadata.city;
+    }
+    
+    let baseUrl = `${domain}/find?range=`;
     let range = items.map(item => item.id);
+    let sortParams = `&sort=${sorter}&order=a&layout=3`
 
-    return baseUrl + range
+    return baseUrl + range + sortParams
   }
 
   function testItems(items) {
