@@ -382,15 +382,25 @@ function omekaClassicApiClient(query, sort) {
 
   // buildHtml: items[ArrayOfItem] -> undefined
   function buildHtml(items) {
-
     // For each item in the sorted list, build HTML using url and title, append
     // this HTML to the items-container.
 
     for (const item of items) {
-      let imgHtml = `<img src="${item.thumbnail}" width=50 height=50>`
-      let innerHtml = `<a href="${item.url}">${imgHtml}</a>`;
-      let html = `<li class="item-display">${innerHtml}</li>`;
-      //let html = `<li class ="item-display"><img src="{item.thumbnail}"></li>`;
+      let html = `
+        <li class="item-display">
+        	<img src="${item.thumbnail}" width=150 height=150>
+          <div class="item-info">
+          	<a href="${item.url}"><p>${item.title}</p></a>
+            <p>${item.date}</p>
+            <p>${item.state}</p>
+            <p>${item.city}</p>
+          </div>
+        </li>
+        `
+      //let imgHtml = `<img src="${item.thumbnail}" width=150 height=150>`;
+      //let innerHtml = `<a href="${item.url}">${imgHtml}</a>`;
+      //let html = `<li class="item-display">${innerHtml}</li>`;
+
       document.getElementById('items-container')
         .insertAdjacentHTML('beforeend', html);
     }
