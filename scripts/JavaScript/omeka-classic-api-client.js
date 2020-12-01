@@ -58,14 +58,15 @@
 
 // Get all items between '1830-1860' AND with a city field equal to 
 // 'Philadelphia' OR 'Pittsburgh'
-var query = {
-  state: 'PA',
-};
+//var query = {
+//  range: '1830-1860',
+//  city: ['Philadelphia', 'Pittsburgh'],
+//};
 
 // sort can be 'date', 'title', 'city', or 'state', it determines the order
 // the items will be sorted and displayed.
 //
-var sort = 'date';
+//var sort = 'date';
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -470,4 +471,4 @@ function omekaClassicApiClient(query, sort) {
   // END ///////////////////////////////////////////////////////////////////////
 }
 
-omekaClassicApiClient(query, sort);
+//omekaClassicApiClient(query, sort);
