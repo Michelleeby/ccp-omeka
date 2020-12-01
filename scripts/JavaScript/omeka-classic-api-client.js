@@ -3,7 +3,7 @@
 // Author(s): Michelle Byrnes
 // Description: Fetches data from Omeka, parses it, and then sorts it according
 // to a query and a sort parameter. 
-// Version: 3.0
+// Version: 4.0
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -30,8 +30,10 @@
 //        the query and sort parameters abstracted out of the function body. 
 //        omekaClassicApiClient now accepts two varaibles, query and sort.
 
-// v3.0 : TODO clean up code, add clarifying comments, complete definitions.
-//				Added image support, removed JQuery dependency. 
+// v3.0 : Added image support, removed JQuery dependency. 
+
+// v4.0 : TODO clean up code, add clarifying comments, complete definitions.
+//				Build items browse UI
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -397,16 +399,25 @@ function omekaClassicApiClient(query, sort) {
           </div>
         </li>
         `
-      //let imgHtml = `<img src="${item.thumbnail}" width=150 height=150>`;
-      //let innerHtml = `<a href="${item.url}">${imgHtml}</a>`;
-      //let html = `<li class="item-display">${innerHtml}</li>`;
-
+        
       document.getElementById('items-container')
         .insertAdjacentHTML('beforeend', html);
     }
-
+		// Build stable link to the records found.
+    let resultsQueryUrl = buildSearchUrl(items);
+    let html = `<p>Found ${items.length} records. <a href="${resultsQueryUrl}">Stable link to records.</a></p>`
+    // Inject link and total results into the results query wrapper element.
+    document.getElementById('results-query-wrapper')
+      .insertAdjacentHTML('beforeend', html)
     // Log the number of items returned.
     console.log(`Returned ${items.length} items.`)
+  }
+
+  function buildSearchUrl(items) {
+    let baseUrl = `${domain}/find?range=`
+    let range = items.map(item => item.id);
+
+    return baseUrl + range
   }
 
   function testItems(items) {
@@ -489,11 +500,21 @@ form.addEventListener("submit", function(event) {
     element.remove();
   }
 
-  let query = {
-    range: `${form['start-year'].value}-${form['end-year'].value}`,
-  };
   let sort = form['sort-value-select'].value;
+  let query = buildQuery(form);
 
   event.preventDefault();
   omekaClassicApiClient(query, sort);
 });
+
+function buildQuery(form) {
+  let query = {};
+  if (form['start-year'] != undefined) {
+    let range = {
+      range: `${form['start-year'].value}-${form['end-year'].value}`,
+    }
+    query = Object.assign(range, query);
+  }
+
+  return query
+}
