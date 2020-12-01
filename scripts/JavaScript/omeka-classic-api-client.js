@@ -30,7 +30,8 @@
 //        the query and sort parameters abstracted out of the function body. 
 //        omekaClassicApiClient now accepts two varaibles, query and sort.
 
-// v3.0 : TODO 
+// v3.0 : TODO clean up code, add clarifying comments, complete definitions.
+//				Added image support, removed JQuery dependency. 
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -57,19 +58,18 @@
 
 // Get all items between '1830-1860' AND with a city field equal to 
 // 'Philadelphia' OR 'Pittsburgh'
-//var query = {
-//  range: '1830-1860',
-//  city: ['Philadelphia', 'Pittsburgh'],
-//};
-//
-// sort can be 'date', 'title', 'city', or 'state', it determines the order the 
-// items will be sorted and displayed.
-//
-//var sort = 'date';
+var query = {
+  state: 'PA',
+};
 
-////////////////////////////////////////////////////////////////////////////////
+// sort can be 'date', 'title', 'city', or 'state', it determines the order
+// the items will be sorted and displayed.
+//
+var sort = 'date';
 
-// DEFINTIONS //////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+// DEFINTIONS /////////////////////////////////////////////////////////////////
 
 // A RESPONSE is a raw FetchResponseObject of the Fetch API.
 // DATA is an ArrayOfObject, that is the parsed RESPONSE.
@@ -137,7 +137,7 @@
 // after the data is parsed and returned as an ArrayOfItem, it is fed into
 // handleItems callback. 
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 function omekaClassicApiClient(query, sort) {
 
@@ -172,6 +172,7 @@ function omekaClassicApiClient(query, sort) {
         city: '',
         state: '',
         country: '',
+        thumbnail: '',
       }, options);
     }
     // Get additional fields by building the field value from existing data.
@@ -199,7 +200,7 @@ function omekaClassicApiClient(query, sort) {
   // fetchItems function. 
   fetch(apiUrl)
     .then(response => buildFetchRequests(response))
-    .then(pages => fetchItems(pages));
+    .then(pages => fetchData(pages));
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -221,20 +222,35 @@ function omekaClassicApiClient(query, sort) {
     return pages;
   }
 
-  // fetchItems: pages[ArrayOfNumber] -> Undefined
-  function fetchItems(pages) {
+  // fetchData: pages[ArrayOfNumber] -> 
+  function fetchData(pages) {
     // Collect all the fetch responses into an array
     Promise.all(pages.map(page => fetch(`${apiUrl}?page=${page}`)
         .then(response => response.json())))
-      // Parse data into items
+      // Parse data into items, seperate items with imgs from items without.
       .then(data => parseData(data))
+      // Build the items to display as HTML
+      .then(items => buildItems(items))
+  }
+
+  // buildItems: items[ArrayOfArrayOfItem] -> 
+  function buildItems(items) {
+    let imgItems = items[0];
+    let noImgItems = items[1];
+    // Fetch all the item image URLs
+    Promise.all(imgItems.map(item => fetch(`${domain}/api/files?item=${item.id}`)
+        .then(response => response.json())))
+      // Add image links to items
+      .then(data => addImgsToItems(data, imgItems, noImgItems))
       // Sort the items
       .then(items => sortItems(items))
-      // Build the HTML, log total items returned
+      // Build HTML to display
       .then(items => buildHtml(items));
   }
 
-  // parseData: data[ArrayOfObject] -> items[ArrayOfItem]
+  // parseData: 
+  // data[ArrayOfObject] -> 
+  // items[ArrayOfItem]
   function parseData(data) {
     // Since each page is its own array of object, flatten the data.
     let blob = data.flat();
@@ -282,15 +298,50 @@ function omekaClassicApiClient(query, sort) {
       if (countryIndex != -1) {
         item.country = chunk.element_texts[countryIndex].text;
       }
-
-      // If item meets query parameters, push it into the acc array.
+      // Set thumbnail to true if this needs to be fetched.
+      if (chunk.files.count > 0) {
+        item.thumbnail = true
+      }
+      // If item meets query parameters, push it into the correct acc array.
       if (parseQuery(query, item)) {
-        acc.push(item);
+        // Seperate items into two arrays, one with images and one without.
+        if (item.thumbnail) {
+          acc[0].push(item);
+        } else {
+          acc[1].push(item);
+        }
       }
 
       return acc
-    }, []);
+    }, [
+      [],
+      []
+    ]);
 
+    return items
+  }
+	// addImgsToItems: 
+  // data[ArrayOfFile], imgItems[ArrayOfItem], noImgItems[ArrayOfItem] -> 
+  // items[ArrayOfItems]
+  function addImgsToItems(data, imgItems, noImgItems) {
+  	// Capture img file URLs into an array.
+    let files = data.map(chunk => {
+      let file = chunk[0].file_urls.fullsize;
+      return file
+    });
+    // Set index to 0
+    let index = 0;
+    // For each item in the imgItems array
+    for (const item of imgItems) {
+    	// Update the thumnail with the appropriate img file URL
+    	item.thumbnail = files[index];
+      // Increment index by 1
+      index++;
+    }
+    // Combine updated imgItems with noImgItems array.
+    let items = imgItems.concat(noImgItems);
+		
+    // Return all the items.
     return items
   }
 
@@ -335,13 +386,20 @@ function omekaClassicApiClient(query, sort) {
     // this HTML to the items-container.
 
     for (const item of items) {
-      let innerHtml = `<p><a href="${item.url}">${item.title}</a></p>`;
+      let imgHtml = `<img src="${item.thumbnail}" width=50 height=50>`
+      let innerHtml = `<a href="${item.url}">${imgHtml}</a>`;
       let html = `<li class="item-display">${innerHtml}</li>`;
-      $('#items-container').append(html);
+      //let html = `<li class ="item-display"><img src="{item.thumbnail}"></li>`;
+      document.getElementById('items-container')
+      .insertAdjacentHTML('beforeend', html);
     }
 
     // Log the number of items returned.
     console.log(`Returned ${items.length} items.`)
+  }
+
+  function testItems(items) {
+    console.log(items);
   }
 
   // parseQuery: query[Object], item[Item] -> Boolean
@@ -412,4 +470,4 @@ function omekaClassicApiClient(query, sort) {
   // END ///////////////////////////////////////////////////////////////////////
 }
 
-//omekaClassicApiClient(query, sort);
+omekaClassicApiClient(query, sort);
