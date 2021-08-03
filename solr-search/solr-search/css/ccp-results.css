@@ -1,0 +1,180 @@
+/** 
+ * Styling for the CCP Omeka site SOLR search result page.
+ * Author(s): Michelle Byrnes
+ */
+
+/**
+ * Document Map
+ *
+ * Screen Groups:
+ *
+ * - Default. {0}
+ * - Tablet   {1}
+ * - Desktop. {2}
+ *
+ * Style Groups:
+ *
+ * - Input Search Box.      {A}
+ * - Search Result Facets.  {B}  
+ * - Search Results.        {C}
+ */
+
+/**
+ * Default.
+ */
+
+/* Input Search Box. {0A} */
+#solr-search-form > input[type="submit"] {
+  background-color: black;
+  padding: 10px;
+  border: none;
+  font-family: Oswald;
+}
+#solr-search-form .float-wrap input[type="text"] {
+  padding: 10px;
+  border-radius: 2px;
+}
+ 
+/* Search Result Facets. {0B} */
+#solr-facets {
+  width: 100%;
+  float: none;
+}
+.facets-container {
+  display: flex;
+  flex-direction: column;
+}
+.facet-container {
+  background-color: #f9f9f9;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+.facet-label {
+  font-family: Oswald;
+  color: #333c44;
+  text-decoration: underline;
+}
+.arrow {
+  border: solid #073e70;
+  border-width: 0 2px 2px 0;
+  display: block;
+  padding: 3px;
+  float: right;
+  margin-top: 6px;
+}
+.up {
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+.down {
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.facet-button-container {
+  display:none;
+}
+.facet-button-container > ul {
+  list-style: none;
+  padding-left: 0;
+}
+.facet-button-container > ul > li:nth-child(n+6) {
+  display:none;
+}
+.facet-button-container > ul > li > a {
+  color: #333c5a;
+  text-decoration: none;
+}
+.facet-button-container > ul > li > a:visited {
+  color: #4e5879;
+}
+#num-found, .facets-title {
+  color: #333c44;
+  font-weight: lighter;
+}
+
+/* Search Results. {0C} */
+#solr-results {
+  margin-left: 0;
+}
+.result {
+  background-color: #f6f6f6;
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+}
+.result-header {
+  padding-bottom: 1em;
+}
+.result-header > a {
+  color: #073e70;
+}
+.result-header > a:visited {
+  color: #6a8ba9;
+}
+.result-description {
+  display: flex;
+  flex-wrap: wrap;
+}
+.result-thumbnail {
+    border: 1px #ccc solid;
+}
+.result-metadata {
+  list-style: none;
+  padding-left: 1em;
+  margin-left: 0;
+  flex-basis: 135px;
+}
+.meta-title {
+  font-family: Oswald;
+  font-size: 13px;
+  color: #333c44;
+}
+.hl {
+    list-style: none;
+    margin-left: 5px;
+    width: 100%;
+    padding-left: 0;
+}
+
+/*
+* Tablet.
+**/
+@media (min-width: 768px) {
+  /* Search Results. {1C}*/
+  .hl {
+    margin-left: 2em;
+    min-width: 304px;
+    flex: 1;  
+  }  
+}
+/*
+* Desktop.
+**/
+@media (min-width: 1200px) {
+  /* Search Result Facets. {2B} */
+  #solr-facets {
+    width: 20%;
+    float: left;
+  }
+  .facet-button-container {
+    display: block;
+  }
+  /* Search Results. {2C} */
+  #solr-results {
+    margin-left: 22%;
+  }
+  .result-description {
+    flex-wrap: nowrap;
+  }
+  .hl {
+    margin-left: 2em;
+    min-width: 304px;
+    flex: 1;  
+  }  
+}
