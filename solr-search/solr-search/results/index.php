@@ -168,7 +168,7 @@
       <div class="result-description">
 
         <!-- Item Thumbnail. -->
-        <a href="<?php echo $url; ?>" target="_blank">
+        <a href="<?php echo $url; ?>">
           <?php
             $item = get_db()->getTable($doc->model)->find($doc->modelid);
             echo item_image(
