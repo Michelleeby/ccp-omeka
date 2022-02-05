@@ -111,8 +111,8 @@ end
 
 url = "http://path.to/api/items"
 
-total_items = HTTP.get(url).headers["Omeka-S-Total-Results"].to_i
-items_per_call = 25.0
+total_items = HTTP.get(url).headers["Omeka-S-Total-Results"].to_f
+items_per_call = 25
 total_calls = (total_items / items_per_call).ceil
 
 rows = items_handler_csv(
